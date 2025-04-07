@@ -1,0 +1,224 @@
+<!doctype html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8" />
+      <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <meta name="description" content="Calculate your ideal bedtime or wake-up time based on sleep cycles and REM phases. Get personalized sleep advice and check your sleep health score.">
+      <title>SleepCycleREMCalculator - Find Your Perfect Sleep Schedule & Advice</title>
+      <!-- Flatpickr CSS -->
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+      <!-- Main Stylesheet -->
+      <link rel="stylesheet" href="/style.css">
+      <style>
+        /* Styles previously in index.html <style> tag are now in style.css or redundant */
+        /* Ensure necessary styles from style.css cover elements previously styled here */
+      </style>
+      <!-- Google Analytics (will be injected by main.js) -->
+    </head>
+    <body class="light-mode"> <!-- Default class, JS will update -->
+      <div id="app">
+        <!-- START: Embedded Header Content -->
+        <header id="main-header">
+            <div class="header-container">
+              <div class="header-top">
+                <a href="/" class="logo-link" aria-label="SleepCycleREMCalculator Home">
+                  <!-- Use image logo -->
+                  <img src="https://i.postimg.cc/jqN0Whnd/Chat-GPT-Image-Apr-7-2025-10-11-21-PM.png" alt="SleepCycleREMCalculator Logo" class="logo-image">
+                  <!-- <span class="logo-text">SleepCycleREMCalculator</span> -->
+                </a>
+                <div class="header-actions">
+                  <button id="hamburger-button" class="hamburger-button" aria-label="Toggle navigation menu" aria-expanded="false">
+                    <span class="hamburger-icon"></span>
+                  </button>
+                </div>
+              </div>
+              <nav class="main-nav" id="nav-links" aria-label="Main navigation">
+                <ul class="nav-list">
+                  <li><a href="/" class="nav-link">Home</a></li>
+                  <li><a href="/blog.html" class="nav-link">Blog</a></li>
+                  <li><a href="/about.html" class="nav-link">About</a></li>
+                  <li><a href="/contact.html" class="nav-link">Contact</a></li>
+                  <li><a href="/privacy.html" class="nav-link">Privacy</a></li>
+                  <li><a href="/terms.html" class="nav-link">Terms</a></li>
+                </ul>
+              </nav>
+            </div>
+        </header>
+        <!-- END: Embedded Header Content -->
+
+        <main>
+          <!-- Theme Toggle Widget Placement -->
+          <div id="theme-toggle-widget" class="theme-toggle-widget" role="region" aria-label="Theme Selector">
+              <button id="theme-toggle-button-new" class="theme-toggle-button-new" aria-label="Toggle light/dark mode" aria-pressed="false">
+                  <!-- Button text set by JS -->
+              </button>
+              <p class="theme-quote" id="theme-quote">
+                  <!-- Quote text set by JS -->
+              </p>
+          </div>
+
+          <section id="sleep-cycle-calculator" class="calculator-section card">
+            <h2><span class="icon">⏱️</span> Sleep Cycle Calculator</h2>
+            <p>Calculate the best time to wake up or go to bed based on 90-minute sleep cycles.</p>
+
+            <div class="tabs" role="tablist" aria-label="Calculator Mode">
+              <button class="tab-button active" data-tab="wake-up" role="tab" aria-selected="true" aria-controls="wake-up-form">I want to wake up at...</button>
+              <button class="tab-button" data-tab="go-to-bed" role="tab" aria-selected="false" aria-controls="go-to-bed-form">I need to go to bed at...</button>
+            </div>
+
+            <form id="wake-up-form" class="calculator-form active-form" role="tabpanel" aria-labelledby="wake-up-tab">
+              <label for="wake-up-time-input">Select your desired wake-up time:</label>
+              <div class="time-picker-container">
+                <input type="text" id="wake-up-time-input" class="flatpickr-input" placeholder="Select wake-up time..." readonly="readonly" aria-label="Desired wake-up time">
+              </div>
+              <button type="submit" class="calculate-button">Calculate Bedtimes</button>
+              <div id="wake-up-results" class="results" aria-live="polite">
+                <p>If you want to wake up at <strong id="target-wake-time">--:-- --</strong>, you should aim to fall asleep at one of these times:</p>
+                <ul id="bedtime-options">
+                  <!-- Results will be populated here -->
+                </ul>
+                <p class="note">It takes the average person 15 minutes to fall asleep.</p>
+              </div>
+            </form>
+
+            <form id="go-to-bed-form" class="calculator-form" role="tabpanel" aria-labelledby="go-to-bed-tab">
+              <label for="bed-time-input">Select your desired bedtime:</label>
+               <div class="time-picker-container">
+                 <input type="text" id="bed-time-input" class="flatpickr-input" placeholder="Select bedtime..." readonly="readonly" aria-label="Desired bedtime">
+                 <button type="button" class="sleep-now-button" data-target="bed-time-input" aria-label="Set bedtime to current time">Sleep Now</button>
+               </div>
+              <button type="submit" class="calculate-button">Calculate Wake-up Times</button>
+               <div id="go-to-bed-results" class="results" aria-live="polite">
+                 <p>If you go to bed at <strong id="target-bed-time">--:-- --</strong>, you should aim to wake up at one of these times for optimal rest:</p>
+                <ul id="wakeup-options">
+                  <!-- Results will be populated here -->
+                </ul>
+                 <p class="note">Assumes you fall asleep around 15 minutes after getting into bed.</p>
+              </div>
+            </form>
+          </section>
+
+          <!-- Sleep Now Section -->
+          <section id="sleep-now-section" class="calculator-section card">
+              <h2><span class="icon">⚡</span> Sleep Now – Use Current Time</h2> <!-- Updated Heading Text -->
+              <p>Going to bed right now? Click the button below to instantly see the best times to set your alarm based on the current time.</p>
+              <button id="sleep-now-button" class="calculate-button">Sleep Now (Use Current Time)</button>
+              <div id="sleep-now-results" class="results" aria-live="polite">
+                  <p>If you go to bed now (<strong id="current-time-display">--:-- --</strong>), you should aim to wake up at one of these times for optimal rest:</p>
+                  <ul id="sleep-now-wakeup-options">
+                      <!-- Results will be populated here -->
+                  </ul>
+                  <p class="note">Assumes you fall asleep around 15 minutes after getting into bed.</p>
+              </div>
+          </section>
+
+          <!-- Interactive Features Section -->
+          <section id="interactive-features" class="calculator-section card">
+            <h2><span class="icon">💡</span> Interactive Sleep Tools</h2>
+            <p>Get personalized insights into your sleep habits.</p>
+
+            <!-- Personalized Sleep Advice Feature -->
+            <div id="personalized-advice" class="ai-feature">
+              <h4><span class="icon">💬</span> Personalized Sleep Advice</h4>
+              <p class="subtitle">Answer a few questions to get a detailed sleep report.</p>
+              <button class="admin-button start-advice-btn">Start Questionnaire</button>
+              <div class="ai-questions" id="advice-questions" style="display: none;">
+                <!-- Questions will be injected here by JS -->
+              </div>
+              <div class="ai-results" id="advice-results" style="display: none;" aria-live="polite">
+                  <!-- Full report content will be injected here by JS -->
+                  <div class="loading-indicator"></div> <!-- Optional placeholder -->
+              </div>
+            </div>
+
+            <!-- Sleep Health Score Feature -->
+            <div id="sleep-health-score" class="ai-feature">
+              <h4><span class="icon">💯</span> Sleep Health Score</h4>
+              <p class="subtitle">Quickly assess your sleep habits with this score.</p>
+              <button class="admin-button start-score-btn">Start Score Quiz</button>
+              <div class="ai-questions" id="score-questions" style="display: none;">
+                <!-- Questions will be injected here by JS -->
+              </div>
+              <div class="ai-results" id="score-results" style="display: none;" aria-live="polite">
+                <h5>Your Sleep Health Score:</h5>
+                <div class="score-display">
+                  <div class="score-meter-container">
+                    <svg viewBox="0 0 36 36" class="score-meter">
+                      <path class="score-circle-bg"
+                        d="M18 2.0845
+                          a 15.9155 15.9155 0 0 1 0 31.831
+                          a 15.9155 15.9155 0 0 1 0 -31.831"
+                      />
+                      <path class="score-circle-progress" id="score-circle"
+                        stroke-dasharray="100, 100" stroke-dashoffset="100"
+                        d="M18 2.0845
+                          a 15.9155 15.9155 0 0 1 0 31.831
+                          a 15.9155 15.9155 0 0 1 0 -31.831"
+                      />
+                      <text x="18" y="21" class="score-text" id="score-text-value">0</text>
+                    </svg>
+                  </div>
+                  <div class="score-insights" id="score-insights-text">
+                    <!-- Insights will be injected here -->
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+
+          <!-- Blog Posts Section -->
+          <section id="blog-posts-section" class="calculator-section card">
+            <h2><span class="icon">📰</span> Blog Posts</h2>
+            <p>Read our latest articles on sleep science, tips, and how to use our calculators effectively.</p>
+            <ul class="blog-post-list">
+              <li>
+                  <a href="/blog/ultimate-sleep-optimization-guide.html">💤 The Ultimate Sleep Optimization Guide: Unlock Your Ideal Sleep-Wake Routine</a>
+                  <span class="intro">Your ultimate guide to using a sleep calculator (bedtime, wake up, sleep cycle, REM) to find the best time to wake up and feel energized... Read More</span>
+              </li>
+              <li>
+                  <a href="/blog/wake-up-time-calculator.html">Wake Up Time Calculator – Sleep Better with Smart Scheduling</a>
+                  <span class="intro">Discover the perfect time to wake up with our wake-up time calculator. Improve your sleep quality... Read More</span>
+              </li>
+              <li>
+                  <a href="/blog/wake-up-time-calculator-science.html">Wake Up Time Calculator: The Science Behind Perfect Sleep Timing</a>
+                  <span class="intro">Discover how the wake up time calculator can transform your mornings... Read More</span>
+              </li>
+              <li>
+                  <a href="/blog/the-ultimate-sleep-calculator-guide.html">The Ultimate Sleep Calculator Guide: Wake Up Refreshed & Energized</a>
+                  <span class="intro">Sync your sleep cycle with your body’s natural rhythms using a sleep calculator. Learn how to find the best time to wake up... Read More</span>
+              </li>
+              <!-- Add more posts here as they are created -->
+            </ul>
+            <div style="text-align: center; margin-top: 1.5rem;">
+                <a href="/blog.html" class="admin-button secondary">View All Blog Posts</a>
+            </div>
+          </section>
+
+        </main>
+
+        <!-- START: Embedded Footer Content -->
+        <footer id="main-footer">
+            <p>&copy; <span id="current-year">2024</span> SleepCycleREMCalculator. All rights reserved.</p>
+            <nav class="footer-links" aria-label="Footer navigation">
+                <a href="/about.html">About</a> |
+                <a href="/contact.html">Contact</a> |
+                <a href="/privacy.html">Privacy Policy</a> |
+                <a href="/terms.html">Terms of Service</a>
+            </nav>
+        </footer>
+        <!-- END: Embedded Footer Content -->
+      </div>
+
+      <!-- Flatpickr JS - REMOVED CDN SCRIPT -->
+      <!-- <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script> -->
+      <!-- Chart.js - REMOVED CDN SCRIPT -->
+      <!-- <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> -->
+
+      <!-- Main App Script (Handles all logic now, including imports) -->
+      <script type="module" src="/main.js"></script>
+      <!-- REMOVED Header/Footer Loader Script -->
+      <!-- <script type="module" src="/header.js"></script> -->
+    </body>
+    </html>
